@@ -12,7 +12,7 @@ module Main where
         case args of
             [file] -> do
                 h <- readFile file
-                let autoDesc = let lst = lines h in if (last lst) /= "" then  [l | l <- (lines h), l /= ""] else [l | l <-  lst, l /= ""] ++ [""] -- potrzebne, żeby móc podawać puste słowo
+                let autoDesc = let lst = lines h in if (null lst) || (last lst) /= "" then  [l | l <- (lines h), l /= ""] else [l | l <-  lst, l /= ""] ++ [""] -- potrzebne, żeby móc podawać puste słowo
                 if length autoDesc < 4 then
                     printFail
                 else do
@@ -47,6 +47,7 @@ module Main where
 
     -- parsuje jedną linię opisującą przejście w automacie
     parseTransition :: Int -> [String] -> Maybe [(Int, Char, [Int])]
+    parseTransition maxState (q:[]) = Nothing
     parseTransition maxState (q:c:d) = if (isJust mState) && (fromJust mState) <= maxState && (all (\x -> x >= 'A' && x <= 'Z') mAlphas) && (all isJust mTrans) 
         then
             let listOfDestinations = [fromJust t | t <- mTrans] in if any (>maxState) listOfDestinations then
